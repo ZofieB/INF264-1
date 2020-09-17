@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.5.14)  17 SEP 2020 17:40
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.5.14)  17 SEP 2020 18:19
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -293,27 +293,28 @@ File: lstlang1.sty 2020/03/24 1.8d listings language file
 ) [1
 
 
-{/usr/local/texlive/2020/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] [3] [4] [5]
-<results.png, id=25, 548.0475pt x 353.32pt>
+{/usr/local/texlive/2020/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] [3] [4] [5] [6]
+<results.png, id=28, 548.0475pt x 353.32pt>
 File: results.png Graphic file (type png)
 <use results.png>
-Package pdftex.def Info: results.png  used on input line 336.
+Package pdftex.def Info: results.png  used on input line 346.
 (pdftex.def)             Requested size: 438.4386pt x 282.65639pt.
+ [7 </Users/sophie/Documents/INF264/INF264_projects/results.png>]
+Overfull \hbox (1.5643pt too wide) in paragraph at lines 367--373
+\OT1/cmr/m/n/12 The ti-me mea-su-re-ments show, that the gi-ven im-ple-men-ta-ti-on from the sklearn
+ []
 
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-[6] [7 </Users/sophie/Documents/INF264/INF264_projects/results.png>] [8] (/Users/sophie/Documents/INF264/INF264_projects/docu.aux) ) 
+[8] (/Users/sophie/Documents/INF264/INF264_projects/docu.aux) ) 
 Here is how much of TeX's memory you used:
  7017 strings out of 480608
  119026 string characters out of 5903630
- 779618 words of memory out of 5000000
+ 807618 words of memory out of 5000000
  22857 multiletter control sequences out of 15000+600000
  538618 words of font info for 48 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 45i,8n,56p,10146b,1725s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 45i,8n,56p,10146b,1729s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on /Users/sophie/Documents/INF264/INF264_projects/docu.pdf (8 pages, 137007 bytes).
+Output written on /Users/sophie/Documents/INF264/INF264_projects/docu.pdf (8 pages, 138379 bytes).
 PDF statistics:
  62 PDF objects out of 1000 (max. 8388607)
  42 compressed objects within 1 object stream

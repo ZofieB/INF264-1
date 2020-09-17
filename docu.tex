@@ -91,8 +91,19 @@ it, the easiest way was to split the function into two parts.
 
 Learn\_rec() is the powerhouse of the learn function and outputs the root node of the decision tree, that is 
 learned on the input data. 
-The function first checks all base cases and outputs the majority label as a leaf. 
 
+It is important to note, that we considered a lot of different options for this function. We tried basically 
+two different options concerning the decision tree:
+\begin{enumerate}
+    \item On a given path in the tree one feature is used at most one time
+    \item A feature can be used multiple times to split on a given path in the tree
+\end{enumerate}
+Both variants result in valid decision trees. Of course the decision tree that is return by the first one is 
+a lot smaller, but it also has a significantly better accuracy. We chose accuracy over performance and 
+therefore decided to allow a label to be used more than once. We know that this solution is also more prone 
+to overfitting, but the use of pruning should reduce this risk.
+
+The function first checks all base cases and outputs the majority label as a leaf.
 \begin{lstlisting}[language=Python]
     if same_value(y):
         return node(y[0])
@@ -102,8 +113,7 @@ The function first checks all base cases and outputs the majority label as a lea
 \end{lstlisting}
 
 When there is no base case 
-present, a feature gets selected based on the selected impurity measure (separately implemented). To keep track 
-of the already used features, the all get appended to an array that is given as a parameter to the function. 
+present, a feature gets selected based on the selected impurity measure (separately implemented).
 The dataset then gets splitted based on the mean of the selected feature. These separate datasets are then 
 used for a recursive call of the same function. All the created nodes get assigned their respective parent 
 and/or children.
@@ -354,5 +364,11 @@ the difference was less than 1.6\% and a slightly lower test-accuracy is to be e
 accuracies to choose this tree.  
 
 \section{Comparison to existing implementations (Sophie)}
+The time measurements show, that the given implementation from the sklearn library is a lot faster. In learning 
+and testing it is 10 times faster than our implementation. This is as expected for many reasons.
+The sklearn decision tree doesn't use pruning per default, which saves a lot of time. The library probably uses 
+optimized data structures to build the tree as well as optimized algorithms. 
+In the design of our decision tree we didn't consider time a critical factor and therefore didn't pay attention 
+to time-saving code and functions.
 
 \end{document}
