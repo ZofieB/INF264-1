@@ -1,7 +1,6 @@
 
 \documentclass[12pt,a4paper]{scrartcl}		% KOMA-Klassen benutzen!
 
-\usepackage[ngerman]{babel}			% deutsche Namen/Umlaute
 \usepackage[utf8]{inputenc}			% Zeichensatzkodierung
 \usepackage{graphicx}				% Einbinden von Bildern
 \usepackage{color}				% Farben wenn es sein muÃŸ
@@ -48,7 +47,7 @@
 
 \abstract
 About the document:
-The names behind every function description point put, who initially wrote the code for this functionality. 
+The names behind every title point out, who initially wrote the code for this functionality. 
 The largest amount of time however went into debugging and correcting the code, as well as re-evaluating the 
 design choices and making the algorithm work. We did all this together, so that it is hard to point out, who 
 did what exactly.
@@ -57,7 +56,8 @@ did what exactly.
 The decision tree is implemented as a node data structure in a semi-object-oriented way. A tree is viewed as 
 a root with children connected to it. That means that every node can be the root of a tree (and every node is 
 indeed the root of its subtree). As every node could be a tree, the decision tree is not encapsulated in a 
-data structure itself and has to be given as a parameter for every function that uses it (see also: learn())
+data structure itself and has to be given as a parameter for every function that uses it (see also: 
+\texttt{learn()})
 The nodes themselves are implemented in the node class, which contains variables for data and the majority 
 label in the subtree denoted by this node. 
 The data variable holds either the feature for the corresponding decision or a label, if the node is a leaf 
@@ -65,6 +65,8 @@ in the tree.
 The majority label is used for pruning.
 The node also has a reference to its parent and its children. The latter are organized in a list of tuples. 
 Every tuple has a reference to the child node as well as the value that is used for the decision. 
+Having both parent and children allows to traverse the data structure in both directions and is only done 
+for convenience.
 
 \begin{lstlisting}[language=Python]
     class node: 
@@ -79,17 +81,18 @@ Every tuple has a reference to the child node as well as the value that is used 
             self.children.append(child)
 \end{lstlisting}
 
-The printTree() is an inorder traversal of a tree denoted by a root-node. 
+The \texttt{printTree()} is an inorder traversal of a tree denoted by a root-node. \\
+
 Remark: We designed the data structure before we knew we only had to compute binary trees, so this could have 
 been implemented easier by just storing each child node separately and having only one variable to denote the 
 decision value.
 
 \section{Implementation of learn (Sophie)}
 The learn function is splitted into two separate functions, as the integration of pruning is easier that way. 
-In fact the learn\_rec() has been learn() in the first place. As we implemented pruning and needed to integrate 
-it, the easiest way was to split the function into two parts.
+In fact the \texttt{learn\_rec()} has been \texttt{learn()} in the first place. With the addition of pruning and the integration 
+of it in this function, \texttt{learn()} was splitted in two parts.\\
 
-Learn\_rec() is the powerhouse of the learn function and outputs the root node of the decision tree, that is 
+\texttt{Learn\_rec()} is the powerhouse of the learn function and outputs the root node of the decision tree, that is 
 learned on the input data. 
 
 It is important to note, that we considered a lot of different options for this function. We tried basically 
@@ -99,15 +102,18 @@ two different options concerning the decision tree:
     \item A feature can be used multiple times to split on a given path in the tree
 \end{enumerate}
 Both variants result in valid decision trees. Of course the decision tree that is return by the first one is 
-a lot smaller, but it also has a significantly better accuracy. We chose accuracy over performance and 
+a lot smaller, but it also has a significantly worse accuracy. We chose accuracy over performance and 
 therefore decided to allow a label to be used more than once. We know that this solution is also more prone 
-to overfitting, but the use of pruning should reduce this risk.
+to overfitting, but the use of pruning should reduce this risk. For this reason there is some 
+legacy code from the former implementation in the learn function. In particular we kept track of the already 
+used labels in the \texttt{used\_feature\_list} array. We kept the code this way to show the process of our work in this 
+project and it also allows us to switch back to the first option quicker if we wanted to.
 
 The function first checks all base cases and outputs the majority label as a leaf.
 \begin{lstlisting}[language=Python]
     if same_value(y):
         return node(y[0])
-    elif len(X[0]) == len(used_feature_list) or same_value(X):
+    elif same_value(X):
         label = get_maj_label(y)
         return node(label)
 \end{lstlisting}
@@ -118,28 +124,29 @@ The dataset then gets splitted based on the mean of the selected feature. These 
 used for a recursive call of the same function. All the created nodes get assigned their respective parent 
 and/or children.
 All this functionality is subdivided in different functions doing smaller tasks.
+These functions are summarized in the help function block. 
+To display the implementation process, we also kept functions we implemented at some point but don't use 
+anymore in a seperate block. \\
 
-Learn()  is just the packaging for the recursion and the pruning in one function. It splits the given dataset, 
+\texttt{Learn()}  is just the packaging for the recursion and the pruning in one function. It splits the given dataset, 
 trains a decision tree with learn and uses pruning afterwards. All of this according to the input, whether 
 pruning is wanted or not.
 
 \begin{lstlisting}[language=Python]
     def learn(X, y, impurity_measure, pruning):
-        seed = 432
-        if(pruning):
-            X_train, X_prun, Y_train, Y_prun = model_selection.train_test_split(X, y, test_size= 0.3, shuffle=True,                                                                                 random_state = seed)
-        else:
-            X_train = X
-            Y_train = y
-        root = learn_rec(X_train, Y_train, [], impurity_measure)
+        seed = 130
         if pruning:
-            root = pruning_function(root, X_prun, Y_prun)
+            X_train, X_prun, Y_train, Y_prun = model_selection.train_test_split(X, y, test_size= 0.1, shuffle=True, random_state = seed)
+            root = learn_rec(np.array(X_train), np.array(Y_train), [], impurity_measure) 
+            root = pruning_function(root, np.array(X_prun), np.array(Y_prun))
+        else:
+            root = learn_rec(X, y, [], impurity_measure) 
         return root
 \end{lstlisting}
 
 \section{Implementation of the impurity measures (Benjamin)}
 Both, entropy as well as the Gini-impurity, need for its calculation only the probabilities of different 
-possible values. The latter is computed by the function “probability\_list” which takes a list of numbers 
+possible values. The latter is computed by the function \texttt{probability\_list} which takes a list of numbers 
 and first counts the occurrence for all the different values. This is done through a for-loop over all 
 elements in the input-list. 
 
@@ -154,9 +161,9 @@ elements in the input-list.
                 if(values[i]==value_list[j]): prob_list[j]+=1
 \end{lstlisting}
  
-If the value of the viewed element didn’t occur before, it gets appended to the value\_list while prob\_list 
-saves the value 1 at the same index. Else the algorithm searches the index in the value\_list with the right 
-value and increments the value in the prob\_list at the right index. 
+If the value of the viewed element didn’t occur before, it gets appended to the \texttt{value\_list} while \texttt{prob\_list} 
+saves the value 1 at the same index. Else the algorithm searches the index in the \texttt{value\_list} with the right 
+value and increments the value in the \texttt{prob\_list} at the right index. 
 To get the probabilities, every numbers of occurrence is divided by the total length of the input-list.
 
 \begin{lstlisting}[language=Python]
@@ -164,7 +171,7 @@ To get the probabilities, every numbers of occurrence is divided by the total le
         prob_list[k] = float(prob_list[k]) / count_values
 \end{lstlisting}
 
-In order to get the entropy and Gini-impurity, one can first compute this probability\_list and implement 
+In order to get the entropy and Gini-impurity, one can first compute this \texttt{probability\_list} and implement 
 the summation with a simple for-loop.
 
 \begin{lstlisting}[language=Python]
@@ -186,7 +193,7 @@ the summation with a simple for-loop.
 \end{lstlisting}
 
 \section{Implementation of the decrease in impurity through a split (Benjamin) }
-The value of decrease in impurity is computed by the function “information\_gain”, which takes a feature-vector x, 
+The value of decrease in impurity is computed by the function \texttt{information\_gain}, which takes a feature-vector x, 
 a label-vector y and a string describing the impurity-measure as input and is implemented in three steps. 
 First, the mean value of all values in x is calculated. This is done by a simple for-loop over all values in x.
 
@@ -199,9 +206,9 @@ First, the mean value of all values in x is calculated. This is done by a simple
     mean /= count
 \end{lstlisting}
 
-Secondly, the split of the label-vector is realised in two lists “leq\_mean” and “g\_mean” containing all 
+Secondly, the split of the label-vector is realised in two lists \texttt{leq\_mean} and \texttt{g\_mean} containing all 
 values from x less equal or greater than the mean. Additionally, the percentual occurrence of the values 
-in “leq\_mean” is computed in “prob\_leq\_mean”.
+in \texttt{leq\_mean} is computed in \texttt{prob\_leq\_mean}.
 
 \begin{lstlisting}[language=Python]
     leq_mean = []
@@ -217,7 +224,7 @@ in “leq\_mean” is computed in “prob\_leq\_mean”.
 \end{lstlisting}
 
 Lastly the Impurities before and after the split are calculated using the already implemented functions 
-“entropy” or “gini”.
+\texttt{entropy()} or \texttt{gini()}.
 
 \begin{lstlisting}[language=Python]
     f(impurity_measure=="entropy"):
@@ -250,40 +257,30 @@ the label memorized in node.data.
         return node.data
 \end{lstlisting}
  
-Otherwise, a for loop goes through the children-list, which is sorted by the value of split. In the case of 
-a binary split, there is only one split point, so in children[0][1] and children[1][1] there is both times 
-memorized the mean-value. 
-Furthermore, if the value of the feature-vector at the splitting feature, which memorized as index in node.data 
-for not-leaf nodes, is less than the mean value, then we recursively call predict for the child-node memorized 
-in children[i][0]. 
+Otherwise it will recursively call predict on the right child as well as the left child.
+For this the children list of the current node is used.
 
 \begin{lstlisting}[language=Python]
-    if(x[node.data] < node.children[i][1]):           
-            return predict(node.children[i][0],x) 
+    if(x[node.data]<= node.children[0][1]):
+        return predict(node.children[0][0],x)  
+    else:
+        return predict(node.children[1][0],x) 
 \end{lstlisting}
 
-If we reached the end of the children-list, it means the vector at the looked upon feature has a higher value 
-than every splitting point and we recursively call predict for the last child-node. 
-
-\begin{lstlisting}[language=Python]
-    elif(i==count_values-1):                    
-            return predict(node.children[i][0], x)
-\end{lstlisting}
-
-Remark: We implemented this function before we knew we only had to compute binary trees, so this could have 
-been implemented easier by just looking at the left and right child.
+Remark: It can't happen that a node has only one child because the binary split is always 
+creating two children.
 
 \section{Implementation of pruning (Benjamin)}
-The pruning-function takes as input a node representing a (sub-)tree and the pruning data X\_prun and y\_prun. 
+The pruning-function takes as input a node representing a (sub-)tree and the pruning data \texttt{X\_prun} and \texttt{y\_prun}. 
 It returns a node representing the post-pruned input-tree. 
-First, the pruning function searches the leafs of the decision tree. Therefore, it recursively calls itself 
-until the length of the children-list is not zero. 
+First, the pruning function is searching the leaves of the tree by recursively calling itself on its children 
+using the split data set according to the feature stored in \texttt{node.data}.
 
 \begin{lstlisting}[language=Python]
-    if (len(node.children)!=0):  
-        for i in range(len(node.children)):
-                #call recursion on each child
-                pruning_function((node.children[i])[0], X_prun, y_prun) 
+    elif (len(node.children)!=0):
+        X_right, X_left, y_right, y_left, val_avg = split_dataset(X_prun, y_prun, node.data)  
+        pruning_function(node.children[0][0], np.array(X_left), y_left)
+        pruning_function(node.children[1][0], np.array(X_right), y_right)
     else:
         #reached leaf
         return node
@@ -294,7 +291,7 @@ pruning-data is lower than the accuracy when predicting the majority label.
 In this case, we change the node into a leaf predicting the majority label. 
 
 \begin{lstlisting}[language=Python]
-    if (acc(node, X_prun, y_prun) < majority_label_acc(node.majority_label, y_prun)):
+    if (acc(node, X_prun, y_prun) <= majority_label_acc(node.majority_label, y_prun)):
         node.data = node.majority_label
         node.children = []
     return node
@@ -322,21 +319,22 @@ The accuracies are implemented through a simple for-loop counting the right pred
 First, we split the Data into Training-, Evaluation and Test-data. 
 
 \begin{lstlisting}[language=Python]
-    seed = 111
-    X_train, X_val_test, Y_train, Y_val_test = model_selection.train_test_split(X, y, test_size= 0.3, shuffle=True, random_state = seed)
-    seed = 112
-    X_val, X_test, Y_val, Y_test = model_selection.train_test_split(X_val_test, Y_val_test, test_size= 0.5, shuffle=True, random_state = seed)
+    seed = 5
+    X_train, X_val_test, Y_train, Y_val_test = model_selection.train_test_split(X, y, test_size= 0.2, shuffle=True, random_state = seed)
+    seed = 221
+    X_val, X_test, Y_val, Y_test = model_selection.train_test_split(X_val_test, Y_val_test, test_size= 0.4, shuffle=True, random_state = seed)
 \end{lstlisting}
 
-We chose a ratio of 0.7, 0.15, 0.15 to have sufficient training-data whilst getting representative accuracies. 
+We chose a ratio of 0.8, 0.12, 0.08 to have sufficient training-data whilst getting representative accuracies.
+The training dataset is also big enough to be splitted for pruning. 
 Afterwards we implemented four trees, one for each impurity measure with and without pruning and computed the 
 accuracy on the training- as well as validation-data. This example shows one the procedure for the tree using 
 entropy and pruning. 
 
 \begin{lstlisting}[language=Python]
     tree_ent_prun = learn(X_train, Y_train, impurity_measure="entropy", pruning=True)
-val_acc_ent_prun = acc(tree_ent_prun, X_val, Y_val)
-train_acc_ent_prun = acc(tree_ent_prun, X_train, Y_train)
+    val_acc_ent_prun = acc(tree_ent_prun, X_val, Y_val)
+    train_acc_ent_prun = acc(tree_ent_prun, X_train, Y_train)
 \end{lstlisting}
 
 We got the following results: 
@@ -352,23 +350,81 @@ the training-accuracy is higher than the validation-accuracy, which was expected
 overfitting. As the validation-accuracy is higher using pruning, we decided to use the tree trained by using 
 entropy and pruning.
 
+Remark:
+We played around with the seeds for the splitting and observed, that different seeds lead to very different results. 
+The accuracies differ a lot between seeds, which suggests, that there is no clear pattern in the data points that 
+can be learned. 
+One example of very different accuracies for our trained models is displayed in figure \ref{fig:difacc}.
+Here the accuracies for the pruning models do not match the expected results. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale = 0.8]{badresults.png}
+    \caption{Different seed}
+    \label{fig:difacc}
+\end{figure}
+
 \section{Testing (Benjamin, Sophie)}
+We chose the model that uses entropy as the impurity measure and pruning, because the validation accuracies were 
+better on the models using pruning. The impurity measures had no difference in their accuracies so we decided 
+to use entropy arbitraryly. 
 We now tested the chosen tree to get a representative estimate of the accuracy. 
+For this we are using the testing data set, that has been unused up to this point, to get accurate testing results.
 
 \begin{lstlisting}[language=Python]
     test_acc = acc(tree_ent_prun, X_test, Y_test)
 \end{lstlisting}
 
-The test-accuracy was with 0.9515 lower than the according training- and validation-accuracy. Nevertheless, 
-the difference was less than 1.6\% and a slightly lower test-accuracy is to be expected as we used the other 
-accuracies to choose this tree.  
+The test-accuracy was with 0.9364 lower than the according training- and validation-accuracy.
+Nevertheless, the difference was less than 5\% and a lower test-accuracy is to be expected as we used the other 
+accuracies to choose this tree. and the test data set was never seen by the model before. 
 
 \section{Comparison to existing implementations (Sophie)}
-The time measurements show, that the given implementation from the sklearn library is a lot faster. In learning 
+\subsection{Time}
+To measure the time performance of both implementations, we measured the time before and after execution of the 
+crucial parts and compared those. The same code is used for every measurement.
+\begin{lstlisting}[language=Python]
+    t1 = time.monotonic()
+    DecisionTree = DecisionTreeClassifier(criterion="entropy")
+    DecisionTree.fit(X_train, Y_train)
+    t2 = time.monotonic()
+    sk_learn_time = t2 - t1
+\end{lstlisting}
+The time measurements (table \ref{tbl:time}) show, that the given implementation from the sklearn library is a lot faster. In learning 
 and testing it is 10 times faster than our implementation. This is as expected for many reasons.
 The sklearn decision tree doesn't use pruning per default, which saves a lot of time. The library probably uses 
 optimized data structures to build the tree as well as optimized algorithms. 
 In the design of our decision tree we didn't consider time a critical factor and therefore didn't pay attention 
 to time-saving code and functions.
+
+Remark: The time measurements yield different values for every execution, so that the values are not exactly 
+reproducable.
+
+\begin{table}
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+         & Learn time & Test time \\
+        \hline
+        Our decision tree & 0.55307 & 0.00424 \\
+        sklearn decision tree & 0.01143 & 0.00084 \\
+        \hline
+    \end{tabular}
+    \caption{Time measurements for both implementations}
+    \label{tbl:time}
+\end{table}
+
+\subsection{Accuracy}
+Figure \ref{fig:acc} shows, that the classifier from the sklearn library perfoms better on test and training data.
+This is expected behaviour, as the sklearn classifier is most likely better optimized than our decision tree classifier. 
+Our decision tree performs better on validation data, which can be explained by the fact, that it uses pruning. 
+As already mentioned, different seeds for the splitting lead to very different results in the accuracies. This would also 
+explain the different accuracies on validation data for the two different models.
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale = 0.8]{sklearnacc.png}
+    \caption{Comparison with sklearn}
+    \label{fig:acc}
+\end{figure}
 
 \end{document}
