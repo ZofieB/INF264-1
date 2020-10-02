@@ -10,3 +10,6 @@ We used:
     numpy
     matplotlib
     sklearn
+    
+ In this first project for the Introduction to Machine Learning course at UiB we needed to implement a decision tree classifier on continuos data from scratch.
+ The implementation includes the option for two different impurity measures and the use of pruning.
