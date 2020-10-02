@@ -13,3 +13,4 @@ We used:
     
  In this first project for the Introduction to Machine Learning course at UiB we needed to implement a decision tree classifier on continuos data from scratch.
  The implementation includes the option for two different impurity measures and the use of pruning.
+ See project1.pdf for more information on the task.
